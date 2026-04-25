@@ -1,3 +1,9 @@
+substitutions:
+  virtual_switch_on_red: "0.0"
+  virtual_switch_on_green: "1.0"
+  virtual_switch_on_blue: "0.0"
+  virtual_switch_on_brightness: "1.0"
+
 binary_sensor:
   - id: !extend bs_button_1_click_event
     on_press:
@@ -204,8 +210,8 @@ switch:
             id(vs1_g1_b) = v.get_blue();
             id(vs1_g1_bri) = v.get_brightness();
             auto call = id(gb_lights_1)[0]->turn_on();
-            call.set_rgb(0, 1, 0);
-            call.set_brightness(1.0);
+            call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
+            call.set_brightness(${virtual_switch_on_brightness});
             call.perform();
           }
           if (0 < id(gb_lights_2).size()) {
@@ -215,8 +221,8 @@ switch:
             id(vs1_g2_b) = v.get_blue();
             id(vs1_g2_bri) = v.get_brightness();
             auto call = id(gb_lights_2)[0]->turn_on();
-            call.set_rgb(0, 1, 0);
-            call.set_brightness(1.0);
+            call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
+            call.set_brightness(${virtual_switch_on_brightness});
             call.perform();
           }
     turn_off_action:
@@ -254,8 +260,8 @@ switch:
             id(vs2_g1_b) = v.get_blue();
             id(vs2_g1_bri) = v.get_brightness();
             auto call = id(gb_lights_1)[1]->turn_on();
-            call.set_rgb(0, 1, 0);
-            call.set_brightness(1.0);
+            call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
+            call.set_brightness(${virtual_switch_on_brightness});
             call.perform();
           }
           if (1 < id(gb_lights_2).size()) {
@@ -265,8 +271,8 @@ switch:
             id(vs2_g2_b) = v.get_blue();
             id(vs2_g2_bri) = v.get_brightness();
             auto call = id(gb_lights_2)[1]->turn_on();
-            call.set_rgb(0, 1, 0);
-            call.set_brightness(1.0);
+            call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
+            call.set_brightness(${virtual_switch_on_brightness});
             call.perform();
           }
     turn_off_action:
@@ -304,8 +310,8 @@ switch:
             id(vs3_g1_b) = v.get_blue();
             id(vs3_g1_bri) = v.get_brightness();
             auto call = id(gb_lights_1)[2]->turn_on();
-            call.set_rgb(0, 1, 0);
-            call.set_brightness(1.0);
+            call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
+            call.set_brightness(${virtual_switch_on_brightness});
             call.perform();
           }
           if (2 < id(gb_lights_2).size()) {
@@ -315,8 +321,8 @@ switch:
             id(vs3_g2_b) = v.get_blue();
             id(vs3_g2_bri) = v.get_brightness();
             auto call = id(gb_lights_2)[2]->turn_on();
-            call.set_rgb(0, 1, 0);
-            call.set_brightness(1.0);
+            call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
+            call.set_brightness(${virtual_switch_on_brightness});
             call.perform();
           }
     turn_off_action:
@@ -354,8 +360,8 @@ switch:
             id(vs4_g1_b) = v.get_blue();
             id(vs4_g1_bri) = v.get_brightness();
             auto call = id(gb_lights_1)[3]->turn_on();
-            call.set_rgb(0, 1, 0);
-            call.set_brightness(1.0);
+            call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
+            call.set_brightness(${virtual_switch_on_brightness});
             call.perform();
           }
           if (3 < id(gb_lights_2).size()) {
@@ -365,8 +371,8 @@ switch:
             id(vs4_g2_b) = v.get_blue();
             id(vs4_g2_bri) = v.get_brightness();
             auto call = id(gb_lights_2)[3]->turn_on();
-            call.set_rgb(0, 1, 0);
-            call.set_brightness(1.0);
+            call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
+            call.set_brightness(${virtual_switch_on_brightness});
             call.perform();
           }
     turn_off_action:
