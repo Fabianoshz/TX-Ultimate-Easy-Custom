@@ -57,7 +57,7 @@ switch:
   - platform: template
     name: "Virtual Switch 1"
     id: virtual_switch_1
-    internal: ${gang_count} < 1
+    internal: ${gang_count < 1}
     lambda: "return id(virtual_state_1);"
     turn_on_action:
       - globals.set:
@@ -102,7 +102,7 @@ switch:
   - platform: template
     name: "Virtual Switch 2"
     id: virtual_switch_2
-    internal: ${gang_count} < 2
+    internal: ${gang_count < 2}
     lambda: "return id(virtual_state_2);"
     turn_on_action:
       - globals.set:
@@ -147,7 +147,7 @@ switch:
   - platform: template
     name: "Virtual Switch 3"
     id: virtual_switch_3
-    internal: ${gang_count} < 3
+    internal: ${gang_count < 3}
     lambda: "return id(virtual_state_3);"
     turn_on_action:
       - globals.set:
@@ -192,7 +192,7 @@ switch:
   - platform: template
     name: "Virtual Switch 4"
     id: virtual_switch_4
-    internal: ${gang_count} < 4
+    internal: ${gang_count < 4}
     lambda: "return id(virtual_state_4);"
     turn_on_action:
       - globals.set:
