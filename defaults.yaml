@@ -1,0 +1,25 @@
+select:
+  - id: !extend sl_button_1_action
+    initial_option: "None"
+  - id: !extend sl_button_2_action
+    initial_option: "None"
+  - id: !extend sl_button_3_action
+    initial_option: "None"
+  - id: !extend sl_button_4_action
+    initial_option: "None"
+  - id: !extend sl_relay_1_light_mode
+    initial_option: "Disabled"
+  - id: !extend sl_relay_2_light_mode
+    initial_option: "Disabled"
+  - id: !extend sl_relay_3_light_mode
+    initial_option: "Disabled"
+  - id: !extend sl_relay_4_light_mode
+    initial_option: "Disabled"
+
+binary_sensor:
+  - id: !extend bs_swipe_up
+    disabled_by_default: false
+  - id: !extend bs_swipe_down
+    disabled_by_default: false
+
+web_server:
