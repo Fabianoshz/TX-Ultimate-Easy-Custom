@@ -1,35 +1,39 @@
 binary_sensor:
   - id: !extend bs_button_1_click_event
     on_press:
-      if:
-        condition:
-          lambda: "return ${gang_count} >= 1;"
-        then:
-          - switch.toggle: virtual_switch_1
+      then:
+        - if:
+            condition:
+              lambda: "return ${gang_count} >= 1;"
+            then:
+              - switch.toggle: virtual_switch_1
 
   - id: !extend bs_button_2_click_event
     on_press:
-      if:
-        condition:
-          lambda: "return ${gang_count} >= 2;"
-        then:
-          - switch.toggle: virtual_switch_2
+      then:
+        - if:
+            condition:
+              lambda: "return ${gang_count} >= 2;"
+            then:
+              - switch.toggle: virtual_switch_2
 
   - id: !extend bs_button_3_click_event
     on_press:
-      if:
-        condition:
-          lambda: "return ${gang_count} >= 3;"
-        then:
-          - switch.toggle: virtual_switch_3
+      then:
+        - if:
+            condition:
+              lambda: "return ${gang_count} >= 3;"
+            then:
+              - switch.toggle: virtual_switch_3
 
   - id: !extend bs_button_4_click_event
     on_press:
-      if:
-        condition:
-          lambda: "return ${gang_count} >= 4;"
-        then:
-          - switch.toggle: virtual_switch_4
+      then:
+        - if:
+            condition:
+              lambda: "return ${gang_count} >= 4;"
+            then:
+              - switch.toggle: virtual_switch_4
 
 globals:
   - id: virtual_state_1
