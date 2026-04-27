@@ -75,7 +75,6 @@ globals:
   - id: vs1_g1_bri
     type: float
     restore_value: false
-    initial_value: "0.5"
   - id: vs1_g2_r
     type: float
     restore_value: false
@@ -91,7 +90,6 @@ globals:
   - id: vs1_g2_bri
     type: float
     restore_value: false
-    initial_value: "0.5"
 
   - id: vs2_g1_r
     type: float
@@ -108,7 +106,6 @@ globals:
   - id: vs2_g1_bri
     type: float
     restore_value: false
-    initial_value: "0.5"
   - id: vs2_g2_r
     type: float
     restore_value: false
@@ -124,7 +121,6 @@ globals:
   - id: vs2_g2_bri
     type: float
     restore_value: false
-    initial_value: "0.5"
 
   - id: vs3_g1_r
     type: float
@@ -141,7 +137,6 @@ globals:
   - id: vs3_g1_bri
     type: float
     restore_value: false
-    initial_value: "0.5"
   - id: vs3_g2_r
     type: float
     restore_value: false
@@ -157,7 +152,6 @@ globals:
   - id: vs3_g2_bri
     type: float
     restore_value: false
-    initial_value: "0.5"
 
   - id: vs4_g1_r
     type: float
@@ -174,7 +168,6 @@ globals:
   - id: vs4_g1_bri
     type: float
     restore_value: false
-    initial_value: "0.5"
   - id: vs4_g2_r
     type: float
     restore_value: false
@@ -190,7 +183,6 @@ globals:
   - id: vs4_g2_bri
     type: float
     restore_value: false
-    initial_value: "0.5"
 
   - id: vs1_g1_on
     type: bool
