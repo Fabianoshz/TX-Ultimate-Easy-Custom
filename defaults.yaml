@@ -1,3 +1,6 @@
+substitutions:
+  LIGHT_BRIGHTNESS_TURN_ON: 20
+
 select:
   - id: !extend sl_button_1_action
     initial_option: "None"
