@@ -192,6 +192,39 @@ globals:
     restore_value: false
     initial_value: "0.5"
 
+  - id: vs1_g1_on
+    type: bool
+    restore_value: false
+    initial_value: "true"
+  - id: vs1_g2_on
+    type: bool
+    restore_value: false
+    initial_value: "true"
+  - id: vs2_g1_on
+    type: bool
+    restore_value: false
+    initial_value: "true"
+  - id: vs2_g2_on
+    type: bool
+    restore_value: false
+    initial_value: "true"
+  - id: vs3_g1_on
+    type: bool
+    restore_value: false
+    initial_value: "true"
+  - id: vs3_g2_on
+    type: bool
+    restore_value: false
+    initial_value: "true"
+  - id: vs4_g1_on
+    type: bool
+    restore_value: false
+    initial_value: "true"
+  - id: vs4_g2_on
+    type: bool
+    restore_value: false
+    initial_value: "true"
+
 switch:
   - platform: template
     name: "Virtual Switch 1"
@@ -209,6 +242,7 @@ switch:
             id(vs1_g1_g) = v.get_green();
             id(vs1_g1_b) = v.get_blue();
             id(vs1_g1_bri) = v.get_brightness();
+            id(vs1_g1_on) = v.is_on();
             auto call = id(gb_lights_1)[0]->turn_on();
             call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
             call.set_brightness(${virtual_switch_on_brightness});
@@ -220,6 +254,7 @@ switch:
             id(vs1_g2_g) = v.get_green();
             id(vs1_g2_b) = v.get_blue();
             id(vs1_g2_bri) = v.get_brightness();
+            id(vs1_g2_on) = v.is_on();
             auto call = id(gb_lights_2)[0]->turn_on();
             call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
             call.set_brightness(${virtual_switch_on_brightness});
@@ -231,16 +266,24 @@ switch:
           value: "false"
       - lambda: |-
           if (0 < id(gb_lights_1).size()) {
-            auto call = id(gb_lights_1)[0]->turn_on();
-            call.set_rgb(id(vs1_g1_r), id(vs1_g1_g), id(vs1_g1_b));
-            call.set_brightness(id(vs1_g1_bri));
-            call.perform();
+            if (id(vs1_g1_on)) {
+              auto call = id(gb_lights_1)[0]->turn_on();
+              call.set_rgb(id(vs1_g1_r), id(vs1_g1_g), id(vs1_g1_b));
+              call.set_brightness(id(vs1_g1_bri));
+              call.perform();
+            } else {
+              id(gb_lights_1)[0]->turn_off().perform();
+            }
           }
           if (0 < id(gb_lights_2).size()) {
-            auto call = id(gb_lights_2)[0]->turn_on();
-            call.set_rgb(id(vs1_g2_r), id(vs1_g2_g), id(vs1_g2_b));
-            call.set_brightness(id(vs1_g2_bri));
-            call.perform();
+            if (id(vs1_g2_on)) {
+              auto call = id(gb_lights_2)[0]->turn_on();
+              call.set_rgb(id(vs1_g2_r), id(vs1_g2_g), id(vs1_g2_b));
+              call.set_brightness(id(vs1_g2_bri));
+              call.perform();
+            } else {
+              id(gb_lights_2)[0]->turn_off().perform();
+            }
           }
 
   - platform: template
@@ -259,6 +302,7 @@ switch:
             id(vs2_g1_g) = v.get_green();
             id(vs2_g1_b) = v.get_blue();
             id(vs2_g1_bri) = v.get_brightness();
+            id(vs2_g1_on) = v.is_on();
             auto call = id(gb_lights_1)[1]->turn_on();
             call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
             call.set_brightness(${virtual_switch_on_brightness});
@@ -270,6 +314,7 @@ switch:
             id(vs2_g2_g) = v.get_green();
             id(vs2_g2_b) = v.get_blue();
             id(vs2_g2_bri) = v.get_brightness();
+            id(vs2_g2_on) = v.is_on();
             auto call = id(gb_lights_2)[1]->turn_on();
             call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
             call.set_brightness(${virtual_switch_on_brightness});
@@ -281,16 +326,24 @@ switch:
           value: "false"
       - lambda: |-
           if (1 < id(gb_lights_1).size()) {
-            auto call = id(gb_lights_1)[1]->turn_on();
-            call.set_rgb(id(vs2_g1_r), id(vs2_g1_g), id(vs2_g1_b));
-            call.set_brightness(id(vs2_g1_bri));
-            call.perform();
+            if (id(vs2_g1_on)) {
+              auto call = id(gb_lights_1)[1]->turn_on();
+              call.set_rgb(id(vs2_g1_r), id(vs2_g1_g), id(vs2_g1_b));
+              call.set_brightness(id(vs2_g1_bri));
+              call.perform();
+            } else {
+              id(gb_lights_1)[1]->turn_off().perform();
+            }
           }
           if (1 < id(gb_lights_2).size()) {
-            auto call = id(gb_lights_2)[1]->turn_on();
-            call.set_rgb(id(vs2_g2_r), id(vs2_g2_g), id(vs2_g2_b));
-            call.set_brightness(id(vs2_g2_bri));
-            call.perform();
+            if (id(vs2_g2_on)) {
+              auto call = id(gb_lights_2)[1]->turn_on();
+              call.set_rgb(id(vs2_g2_r), id(vs2_g2_g), id(vs2_g2_b));
+              call.set_brightness(id(vs2_g2_bri));
+              call.perform();
+            } else {
+              id(gb_lights_2)[1]->turn_off().perform();
+            }
           }
 
   - platform: template
@@ -309,6 +362,7 @@ switch:
             id(vs3_g1_g) = v.get_green();
             id(vs3_g1_b) = v.get_blue();
             id(vs3_g1_bri) = v.get_brightness();
+            id(vs3_g1_on) = v.is_on();
             auto call = id(gb_lights_1)[2]->turn_on();
             call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
             call.set_brightness(${virtual_switch_on_brightness});
@@ -320,6 +374,7 @@ switch:
             id(vs3_g2_g) = v.get_green();
             id(vs3_g2_b) = v.get_blue();
             id(vs3_g2_bri) = v.get_brightness();
+            id(vs3_g2_on) = v.is_on();
             auto call = id(gb_lights_2)[2]->turn_on();
             call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
             call.set_brightness(${virtual_switch_on_brightness});
@@ -331,16 +386,24 @@ switch:
           value: "false"
       - lambda: |-
           if (2 < id(gb_lights_1).size()) {
-            auto call = id(gb_lights_1)[2]->turn_on();
-            call.set_rgb(id(vs3_g1_r), id(vs3_g1_g), id(vs3_g1_b));
-            call.set_brightness(id(vs3_g1_bri));
-            call.perform();
+            if (id(vs3_g1_on)) {
+              auto call = id(gb_lights_1)[2]->turn_on();
+              call.set_rgb(id(vs3_g1_r), id(vs3_g1_g), id(vs3_g1_b));
+              call.set_brightness(id(vs3_g1_bri));
+              call.perform();
+            } else {
+              id(gb_lights_1)[2]->turn_off().perform();
+            }
           }
           if (2 < id(gb_lights_2).size()) {
-            auto call = id(gb_lights_2)[2]->turn_on();
-            call.set_rgb(id(vs3_g2_r), id(vs3_g2_g), id(vs3_g2_b));
-            call.set_brightness(id(vs3_g2_bri));
-            call.perform();
+            if (id(vs3_g2_on)) {
+              auto call = id(gb_lights_2)[2]->turn_on();
+              call.set_rgb(id(vs3_g2_r), id(vs3_g2_g), id(vs3_g2_b));
+              call.set_brightness(id(vs3_g2_bri));
+              call.perform();
+            } else {
+              id(gb_lights_2)[2]->turn_off().perform();
+            }
           }
 
   - platform: template
@@ -359,6 +422,7 @@ switch:
             id(vs4_g1_g) = v.get_green();
             id(vs4_g1_b) = v.get_blue();
             id(vs4_g1_bri) = v.get_brightness();
+            id(vs4_g1_on) = v.is_on();
             auto call = id(gb_lights_1)[3]->turn_on();
             call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
             call.set_brightness(${virtual_switch_on_brightness});
@@ -370,6 +434,7 @@ switch:
             id(vs4_g2_g) = v.get_green();
             id(vs4_g2_b) = v.get_blue();
             id(vs4_g2_bri) = v.get_brightness();
+            id(vs4_g2_on) = v.is_on();
             auto call = id(gb_lights_2)[3]->turn_on();
             call.set_rgb(${virtual_switch_on_red}, ${virtual_switch_on_green}, ${virtual_switch_on_blue});
             call.set_brightness(${virtual_switch_on_brightness});
@@ -381,14 +446,22 @@ switch:
           value: "false"
       - lambda: |-
           if (3 < id(gb_lights_1).size()) {
-            auto call = id(gb_lights_1)[3]->turn_on();
-            call.set_rgb(id(vs4_g1_r), id(vs4_g1_g), id(vs4_g1_b));
-            call.set_brightness(id(vs4_g1_bri));
-            call.perform();
+            if (id(vs4_g1_on)) {
+              auto call = id(gb_lights_1)[3]->turn_on();
+              call.set_rgb(id(vs4_g1_r), id(vs4_g1_g), id(vs4_g1_b));
+              call.set_brightness(id(vs4_g1_bri));
+              call.perform();
+            } else {
+              id(gb_lights_1)[3]->turn_off().perform();
+            }
           }
           if (3 < id(gb_lights_2).size()) {
-            auto call = id(gb_lights_2)[3]->turn_on();
-            call.set_rgb(id(vs4_g2_r), id(vs4_g2_g), id(vs4_g2_b));
-            call.set_brightness(id(vs4_g2_bri));
-            call.perform();
+            if (id(vs4_g2_on)) {
+              auto call = id(gb_lights_2)[3]->turn_on();
+              call.set_rgb(id(vs4_g2_r), id(vs4_g2_g), id(vs4_g2_b));
+              call.set_brightness(id(vs4_g2_bri));
+              call.perform();
+            } else {
+              id(gb_lights_2)[3]->turn_off().perform();
+            }
           }
