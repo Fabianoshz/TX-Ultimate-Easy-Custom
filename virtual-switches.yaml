@@ -1,7 +1,7 @@
 substitutions:
   virtual_switch_on_red: "0.0"
-  virtual_switch_on_green: "1.0"
-  virtual_switch_on_blue: "0.0"
+  virtual_switch_on_green: "0.2"
+  virtual_switch_on_blue: "0.6"
   virtual_switch_on_brightness: "0.11"
 
 binary_sensor:
