@@ -1,5 +1,6 @@
 substitutions:
   LIGHT_BRIGHTNESS_TURN_ON: 20
+  BUTTON_MULTI_CLICK_DELAY: "0"
 
 select:
   - id: !extend sl_button_1_action
