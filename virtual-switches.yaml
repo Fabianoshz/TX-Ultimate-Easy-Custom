@@ -36,6 +36,37 @@ output:
     write_action:
       - lambda: return;
 
+  - platform: template
+    id: vs_on_n_red_out
+    type: float
+    write_action:
+      - lambda: return;
+  - platform: template
+    id: vs_on_n_green_out
+    type: float
+    write_action:
+      - lambda: return;
+  - platform: template
+    id: vs_on_n_blue_out
+    type: float
+    write_action:
+      - lambda: return;
+  - platform: template
+    id: vs_off_n_red_out
+    type: float
+    write_action:
+      - lambda: return;
+  - platform: template
+    id: vs_off_n_green_out
+    type: float
+    write_action:
+      - lambda: return;
+  - platform: template
+    id: vs_off_n_blue_out
+    type: float
+    write_action:
+      - lambda: return;
+
 light:
   - platform: rgb
     name: "Virtual Switch On Color"
@@ -78,9 +109,9 @@ light:
   - platform: rgb
     name: "Virtual Switch On Color Night"
     id: vs_on_light_night
-    red: vs_on_red_out
-    green: vs_on_green_out
-    blue: vs_on_blue_out
+    red: vs_on_n_red_out
+    green: vs_on_n_green_out
+    blue: vs_on_n_blue_out
     restore_mode: RESTORE_DEFAULT_OFF
     default_transition_length: 0ms
     on_state:
@@ -97,9 +128,9 @@ light:
   - platform: rgb
     name: "Virtual Switch Off Color Night"
     id: vs_off_light_night
-    red: vs_off_red_out
-    green: vs_off_green_out
-    blue: vs_off_blue_out
+    red: vs_off_n_red_out
+    green: vs_off_n_green_out
+    blue: vs_off_n_blue_out
     restore_mode: RESTORE_DEFAULT_OFF
     default_transition_length: 0ms
     on_state:
@@ -273,164 +304,6 @@ globals:
     restore_value: true
     initial_value: "false"
 
-  # Saved light state before turning green (r, g, b, brightness) per switch per light group
-  - id: vs1_g1_r
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs1_g1_g
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs1_g1_b
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs1_g1_bri
-    type: float
-    restore_value: false
-  - id: vs1_g2_r
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs1_g2_g
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs1_g2_b
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs1_g2_bri
-    type: float
-    restore_value: false
-
-  - id: vs2_g1_r
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs2_g1_g
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs2_g1_b
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs2_g1_bri
-    type: float
-    restore_value: false
-  - id: vs2_g2_r
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs2_g2_g
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs2_g2_b
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs2_g2_bri
-    type: float
-    restore_value: false
-
-  - id: vs3_g1_r
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs3_g1_g
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs3_g1_b
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs3_g1_bri
-    type: float
-    restore_value: false
-  - id: vs3_g2_r
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs3_g2_g
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs3_g2_b
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs3_g2_bri
-    type: float
-    restore_value: false
-
-  - id: vs4_g1_r
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs4_g1_g
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs4_g1_b
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs4_g1_bri
-    type: float
-    restore_value: false
-  - id: vs4_g2_r
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs4_g2_g
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs4_g2_b
-    type: float
-    restore_value: false
-    initial_value: "1.0"
-  - id: vs4_g2_bri
-    type: float
-    restore_value: false
-
-  - id: vs1_g1_on
-    type: bool
-    restore_value: false
-    initial_value: "true"
-  - id: vs1_g2_on
-    type: bool
-    restore_value: false
-    initial_value: "true"
-  - id: vs2_g1_on
-    type: bool
-    restore_value: false
-    initial_value: "true"
-  - id: vs2_g2_on
-    type: bool
-    restore_value: false
-    initial_value: "true"
-  - id: vs3_g1_on
-    type: bool
-    restore_value: false
-    initial_value: "true"
-  - id: vs3_g2_on
-    type: bool
-    restore_value: false
-    initial_value: "true"
-  - id: vs4_g1_on
-    type: bool
-    restore_value: false
-    initial_value: "true"
-  - id: vs4_g2_on
-    type: bool
-    restore_value: false
-    initial_value: "true"
-
 switch:
   - platform: template
     name: "Virtual Switch 1"
@@ -449,24 +322,12 @@ switch:
           float b = is_night ? id(vs_on_n_b) : id(vs_on_b);
           float bri = is_night ? id(vs_on_n_bri) : id(vs_on_bri);
           if (0 < id(gb_lights_1).size()) {
-            auto &v = id(gb_lights_1)[0]->current_values;
-            id(vs1_g1_r) = v.get_red();
-            id(vs1_g1_g) = v.get_green();
-            id(vs1_g1_b) = v.get_blue();
-            id(vs1_g1_bri) = v.get_brightness();
-            id(vs1_g1_on) = v.is_on();
             auto call = id(gb_lights_1)[0]->turn_on();
             call.set_rgb(r, g, b);
             call.set_brightness(bri);
             call.perform();
           }
           if (0 < id(gb_lights_2).size()) {
-            auto &v = id(gb_lights_2)[0]->current_values;
-            id(vs1_g2_r) = v.get_red();
-            id(vs1_g2_g) = v.get_green();
-            id(vs1_g2_b) = v.get_blue();
-            id(vs1_g2_bri) = v.get_brightness();
-            id(vs1_g2_on) = v.is_on();
             auto call = id(gb_lights_2)[0]->turn_on();
             call.set_rgb(r, g, b);
             call.set_brightness(bri);
@@ -521,24 +382,12 @@ switch:
           float b = is_night ? id(vs_on_n_b) : id(vs_on_b);
           float bri = is_night ? id(vs_on_n_bri) : id(vs_on_bri);
           if (1 < id(gb_lights_1).size()) {
-            auto &v = id(gb_lights_1)[1]->current_values;
-            id(vs2_g1_r) = v.get_red();
-            id(vs2_g1_g) = v.get_green();
-            id(vs2_g1_b) = v.get_blue();
-            id(vs2_g1_bri) = v.get_brightness();
-            id(vs2_g1_on) = v.is_on();
             auto call = id(gb_lights_1)[1]->turn_on();
             call.set_rgb(r, g, b);
             call.set_brightness(bri);
             call.perform();
           }
           if (1 < id(gb_lights_2).size()) {
-            auto &v = id(gb_lights_2)[1]->current_values;
-            id(vs2_g2_r) = v.get_red();
-            id(vs2_g2_g) = v.get_green();
-            id(vs2_g2_b) = v.get_blue();
-            id(vs2_g2_bri) = v.get_brightness();
-            id(vs2_g2_on) = v.is_on();
             auto call = id(gb_lights_2)[1]->turn_on();
             call.set_rgb(r, g, b);
             call.set_brightness(bri);
@@ -593,24 +442,12 @@ switch:
           float b = is_night ? id(vs_on_n_b) : id(vs_on_b);
           float bri = is_night ? id(vs_on_n_bri) : id(vs_on_bri);
           if (2 < id(gb_lights_1).size()) {
-            auto &v = id(gb_lights_1)[2]->current_values;
-            id(vs3_g1_r) = v.get_red();
-            id(vs3_g1_g) = v.get_green();
-            id(vs3_g1_b) = v.get_blue();
-            id(vs3_g1_bri) = v.get_brightness();
-            id(vs3_g1_on) = v.is_on();
             auto call = id(gb_lights_1)[2]->turn_on();
             call.set_rgb(r, g, b);
             call.set_brightness(bri);
             call.perform();
           }
           if (2 < id(gb_lights_2).size()) {
-            auto &v = id(gb_lights_2)[2]->current_values;
-            id(vs3_g2_r) = v.get_red();
-            id(vs3_g2_g) = v.get_green();
-            id(vs3_g2_b) = v.get_blue();
-            id(vs3_g2_bri) = v.get_brightness();
-            id(vs3_g2_on) = v.is_on();
             auto call = id(gb_lights_2)[2]->turn_on();
             call.set_rgb(r, g, b);
             call.set_brightness(bri);
@@ -665,24 +502,12 @@ switch:
           float b = is_night ? id(vs_on_n_b) : id(vs_on_b);
           float bri = is_night ? id(vs_on_n_bri) : id(vs_on_bri);
           if (3 < id(gb_lights_1).size()) {
-            auto &v = id(gb_lights_1)[3]->current_values;
-            id(vs4_g1_r) = v.get_red();
-            id(vs4_g1_g) = v.get_green();
-            id(vs4_g1_b) = v.get_blue();
-            id(vs4_g1_bri) = v.get_brightness();
-            id(vs4_g1_on) = v.is_on();
             auto call = id(gb_lights_1)[3]->turn_on();
             call.set_rgb(r, g, b);
             call.set_brightness(bri);
             call.perform();
           }
           if (3 < id(gb_lights_2).size()) {
-            auto &v = id(gb_lights_2)[3]->current_values;
-            id(vs4_g2_r) = v.get_red();
-            id(vs4_g2_g) = v.get_green();
-            id(vs4_g2_b) = v.get_blue();
-            id(vs4_g2_bri) = v.get_brightness();
-            id(vs4_g2_on) = v.is_on();
             auto call = id(gb_lights_2)[3]->turn_on();
             call.set_rgb(r, g, b);
             call.set_brightness(bri);
