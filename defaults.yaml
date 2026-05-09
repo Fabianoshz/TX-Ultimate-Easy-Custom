@@ -25,4 +25,8 @@ binary_sensor:
   - id: !extend bs_swipe_down
     disabled_by_default: false
 
+number:
+  - id: !extend nr_touch_duration
+    initial_value: 200
+
 web_server:
