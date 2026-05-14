@@ -156,7 +156,7 @@ time:
           - script.execute: vs_apply_time_profile
       - seconds: 0
         minutes: 0
-        hours: 6
+        hours: 8
         then:
           - script.execute: vs_apply_time_profile
 
