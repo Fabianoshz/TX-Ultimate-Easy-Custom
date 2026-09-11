@@ -144,54 +144,97 @@ light:
               id(vs_off_n_bri) = v.get_brightness();
             }
 
+  # Covers the entire strip. Used as a night-time background wash so the LEDs
+  # that no gang owns are lit too; painted before the per-gang segments, which
+  # then overwrite their own LEDs in the same buffer.
+  - platform: partition
+    name: "Virtual Switch Fill"
+    id: vs_fill_light
+    internal: true
+    restore_mode: ALWAYS_OFF
+    default_transition_length: 0ms
+    segments:
+      - id: light_full
+        from: 0
+        to: 31
+
 time:
   - platform: sntp
     id: device_time
     timezone: America/Sao_Paulo
+    on_time_sync:
+      then:
+        - script.execute: vs_paint_lights
     on_time:
       - seconds: 0
         minutes: 0
         hours: 20
         then:
-          - script.execute: vs_apply_time_profile
+          - script.execute: vs_paint_lights
       - seconds: 0
         minutes: 0
         hours: 8
         then:
-          - script.execute: vs_apply_time_profile
+          - script.execute: vs_paint_lights
 
 script:
-  - id: vs_apply_time_profile
+  # Single painter for every LED on the panel. Between 20:00 and 08:00 the night
+  # palette replaces the day one and washes the whole strip; the per-gang segments
+  # are then drawn on top so each relay keeps its own on/off indication.
+  # Every write happens in one lambda, so the strip is shown once and never flickers.
+  - id: vs_paint_lights
     mode: restart
     then:
-      - if:
-          condition:
-            lambda: "return ${gang_count} >= 1 && id(virtual_state_1);"
-          then:
-            - switch.turn_on: virtual_switch_1
-          else:
-            - switch.turn_off: virtual_switch_1
-      - if:
-          condition:
-            lambda: "return ${gang_count} >= 2 && id(virtual_state_2);"
-          then:
-            - switch.turn_on: virtual_switch_2
-          else:
-            - switch.turn_off: virtual_switch_2
-      - if:
-          condition:
-            lambda: "return ${gang_count} >= 3 && id(virtual_state_3);"
-          then:
-            - switch.turn_on: virtual_switch_3
-          else:
-            - switch.turn_off: virtual_switch_3
-      - if:
-          condition:
-            lambda: "return ${gang_count} >= 4 && id(virtual_state_4);"
-          then:
-            - switch.turn_on: virtual_switch_4
-          else:
-            - switch.turn_off: virtual_switch_4
+      - lambda: |-
+          auto now = id(device_time).now();
+          const bool is_night = now.is_valid() && (now.hour >= 20 || now.hour < 8);
+
+          // Background wash: night "off" colour at night, dark during the day.
+          const float fill_bri = is_night ? id(vs_off_n_bri) : 0.0f;
+          if (fill_bri > 0.0f) {
+            auto call = id(vs_fill_light).turn_on();
+            call.set_rgb(id(vs_off_n_r), id(vs_off_n_g), id(vs_off_n_b));
+            call.set_brightness(fill_bri);
+            call.set_transition_length(0);
+            call.perform();
+          } else {
+            auto call = id(vs_fill_light).turn_off();
+            call.set_transition_length(0);
+            call.perform();
+          }
+
+          const bool states[4] = {id(virtual_state_1), id(virtual_state_2),
+                                  id(virtual_state_3), id(virtual_state_4)};
+          std::vector<light::LightState *> *groups[2] = {&id(gb_lights_1), &id(gb_lights_2)};
+
+          for (uint8_t i = 0; i < ${gang_count}; i++) {
+            const bool on = states[i];
+            const float r   = on ? (is_night ? id(vs_on_n_r)   : id(vs_on_r))
+                                 : (is_night ? id(vs_off_n_r)   : id(vs_off_r));
+            const float g   = on ? (is_night ? id(vs_on_n_g)   : id(vs_on_g))
+                                 : (is_night ? id(vs_off_n_g)   : id(vs_off_g));
+            const float b   = on ? (is_night ? id(vs_on_n_b)   : id(vs_on_b))
+                                 : (is_night ? id(vs_off_n_b)   : id(vs_off_b));
+            const float bri = on ? (is_night ? id(vs_on_n_bri) : id(vs_on_bri))
+                                 : (is_night ? id(vs_off_n_bri) : id(vs_off_bri));
+
+            for (auto *group : groups) {
+              if (i >= group->size()) {
+                continue;
+              }
+              auto *segment = (*group)[i];
+              if (bri <= 0.0f) {
+                // Matches the wash, which is also dark whenever bri is 0.
+                segment->turn_off().set_transition_length(0).perform();
+                continue;
+              }
+              auto call = segment->turn_on();
+              call.set_rgb(r, g, b);
+              call.set_brightness(bri);
+              call.set_transition_length(0);
+              call.perform();
+            }
+          }
 
   - id: !extend button_action
     parameters:
@@ -217,7 +260,6 @@ script:
               if (${gang_count} >= 4) id(virtual_switch_4).toggle();
               break;
           }
-
 globals:
   - id: vs_on_r
     type: float
@@ -314,57 +356,12 @@ switch:
       - globals.set:
           id: virtual_state_1
           value: "true"
-      - lambda: |-
-          auto now = id(device_time).now();
-          bool is_night = now.is_valid() && (now.hour >= 20 || now.hour < 6);
-          float r = is_night ? id(vs_on_n_r) : id(vs_on_r);
-          float g = is_night ? id(vs_on_n_g) : id(vs_on_g);
-          float b = is_night ? id(vs_on_n_b) : id(vs_on_b);
-          float bri = is_night ? id(vs_on_n_bri) : id(vs_on_bri);
-          if (0 < id(gb_lights_1).size()) {
-            auto call = id(gb_lights_1)[0]->turn_on();
-            call.set_rgb(r, g, b);
-            call.set_brightness(bri);
-            call.perform();
-          }
-          if (0 < id(gb_lights_2).size()) {
-            auto call = id(gb_lights_2)[0]->turn_on();
-            call.set_rgb(r, g, b);
-            call.set_brightness(bri);
-            call.perform();
-          }
+      - script.execute: vs_paint_lights
     turn_off_action:
       - globals.set:
           id: virtual_state_1
           value: "false"
-      - lambda: |-
-          auto now = id(device_time).now();
-          bool is_night = now.is_valid() && (now.hour >= 20 || now.hour < 6);
-          float r = is_night ? id(vs_off_n_r) : id(vs_off_r);
-          float g = is_night ? id(vs_off_n_g) : id(vs_off_g);
-          float b = is_night ? id(vs_off_n_b) : id(vs_off_b);
-          float bri = is_night ? id(vs_off_n_bri) : id(vs_off_bri);
-          if (0 < id(gb_lights_1).size()) {
-            if (bri <= 0.0f) {
-              id(gb_lights_1)[0]->turn_off().perform();
-            } else {
-              auto call = id(gb_lights_1)[0]->turn_on();
-              call.set_rgb(r, g, b);
-              call.set_brightness(bri);
-              call.perform();
-            }
-          }
-          if (0 < id(gb_lights_2).size()) {
-            if (bri <= 0.0f) {
-              id(gb_lights_2)[0]->turn_off().perform();
-            } else {
-              auto call = id(gb_lights_2)[0]->turn_on();
-              call.set_rgb(r, g, b);
-              call.set_brightness(bri);
-              call.perform();
-            }
-          }
-
+      - script.execute: vs_paint_lights
   - platform: template
     name: "Virtual Switch 2"
     id: virtual_switch_2
@@ -374,57 +371,12 @@ switch:
       - globals.set:
           id: virtual_state_2
           value: "true"
-      - lambda: |-
-          auto now = id(device_time).now();
-          bool is_night = now.is_valid() && (now.hour >= 20 || now.hour < 6);
-          float r = is_night ? id(vs_on_n_r) : id(vs_on_r);
-          float g = is_night ? id(vs_on_n_g) : id(vs_on_g);
-          float b = is_night ? id(vs_on_n_b) : id(vs_on_b);
-          float bri = is_night ? id(vs_on_n_bri) : id(vs_on_bri);
-          if (1 < id(gb_lights_1).size()) {
-            auto call = id(gb_lights_1)[1]->turn_on();
-            call.set_rgb(r, g, b);
-            call.set_brightness(bri);
-            call.perform();
-          }
-          if (1 < id(gb_lights_2).size()) {
-            auto call = id(gb_lights_2)[1]->turn_on();
-            call.set_rgb(r, g, b);
-            call.set_brightness(bri);
-            call.perform();
-          }
+      - script.execute: vs_paint_lights
     turn_off_action:
       - globals.set:
           id: virtual_state_2
           value: "false"
-      - lambda: |-
-          auto now = id(device_time).now();
-          bool is_night = now.is_valid() && (now.hour >= 20 || now.hour < 6);
-          float r = is_night ? id(vs_off_n_r) : id(vs_off_r);
-          float g = is_night ? id(vs_off_n_g) : id(vs_off_g);
-          float b = is_night ? id(vs_off_n_b) : id(vs_off_b);
-          float bri = is_night ? id(vs_off_n_bri) : id(vs_off_bri);
-          if (1 < id(gb_lights_1).size()) {
-            if (bri <= 0.0f) {
-              id(gb_lights_1)[1]->turn_off().perform();
-            } else {
-              auto call = id(gb_lights_1)[1]->turn_on();
-              call.set_rgb(r, g, b);
-              call.set_brightness(bri);
-              call.perform();
-            }
-          }
-          if (1 < id(gb_lights_2).size()) {
-            if (bri <= 0.0f) {
-              id(gb_lights_2)[1]->turn_off().perform();
-            } else {
-              auto call = id(gb_lights_2)[1]->turn_on();
-              call.set_rgb(r, g, b);
-              call.set_brightness(bri);
-              call.perform();
-            }
-          }
-
+      - script.execute: vs_paint_lights
   - platform: template
     name: "Virtual Switch 3"
     id: virtual_switch_3
@@ -434,57 +386,12 @@ switch:
       - globals.set:
           id: virtual_state_3
           value: "true"
-      - lambda: |-
-          auto now = id(device_time).now();
-          bool is_night = now.is_valid() && (now.hour >= 20 || now.hour < 6);
-          float r = is_night ? id(vs_on_n_r) : id(vs_on_r);
-          float g = is_night ? id(vs_on_n_g) : id(vs_on_g);
-          float b = is_night ? id(vs_on_n_b) : id(vs_on_b);
-          float bri = is_night ? id(vs_on_n_bri) : id(vs_on_bri);
-          if (2 < id(gb_lights_1).size()) {
-            auto call = id(gb_lights_1)[2]->turn_on();
-            call.set_rgb(r, g, b);
-            call.set_brightness(bri);
-            call.perform();
-          }
-          if (2 < id(gb_lights_2).size()) {
-            auto call = id(gb_lights_2)[2]->turn_on();
-            call.set_rgb(r, g, b);
-            call.set_brightness(bri);
-            call.perform();
-          }
+      - script.execute: vs_paint_lights
     turn_off_action:
       - globals.set:
           id: virtual_state_3
           value: "false"
-      - lambda: |-
-          auto now = id(device_time).now();
-          bool is_night = now.is_valid() && (now.hour >= 20 || now.hour < 6);
-          float r = is_night ? id(vs_off_n_r) : id(vs_off_r);
-          float g = is_night ? id(vs_off_n_g) : id(vs_off_g);
-          float b = is_night ? id(vs_off_n_b) : id(vs_off_b);
-          float bri = is_night ? id(vs_off_n_bri) : id(vs_off_bri);
-          if (2 < id(gb_lights_1).size()) {
-            if (bri <= 0.0f) {
-              id(gb_lights_1)[2]->turn_off().perform();
-            } else {
-              auto call = id(gb_lights_1)[2]->turn_on();
-              call.set_rgb(r, g, b);
-              call.set_brightness(bri);
-              call.perform();
-            }
-          }
-          if (2 < id(gb_lights_2).size()) {
-            if (bri <= 0.0f) {
-              id(gb_lights_2)[2]->turn_off().perform();
-            } else {
-              auto call = id(gb_lights_2)[2]->turn_on();
-              call.set_rgb(r, g, b);
-              call.set_brightness(bri);
-              call.perform();
-            }
-          }
-
+      - script.execute: vs_paint_lights
   - platform: template
     name: "Virtual Switch 4"
     id: virtual_switch_4
@@ -494,53 +401,9 @@ switch:
       - globals.set:
           id: virtual_state_4
           value: "true"
-      - lambda: |-
-          auto now = id(device_time).now();
-          bool is_night = now.is_valid() && (now.hour >= 20 || now.hour < 6);
-          float r = is_night ? id(vs_on_n_r) : id(vs_on_r);
-          float g = is_night ? id(vs_on_n_g) : id(vs_on_g);
-          float b = is_night ? id(vs_on_n_b) : id(vs_on_b);
-          float bri = is_night ? id(vs_on_n_bri) : id(vs_on_bri);
-          if (3 < id(gb_lights_1).size()) {
-            auto call = id(gb_lights_1)[3]->turn_on();
-            call.set_rgb(r, g, b);
-            call.set_brightness(bri);
-            call.perform();
-          }
-          if (3 < id(gb_lights_2).size()) {
-            auto call = id(gb_lights_2)[3]->turn_on();
-            call.set_rgb(r, g, b);
-            call.set_brightness(bri);
-            call.perform();
-          }
+      - script.execute: vs_paint_lights
     turn_off_action:
       - globals.set:
           id: virtual_state_4
           value: "false"
-      - lambda: |-
-          auto now = id(device_time).now();
-          bool is_night = now.is_valid() && (now.hour >= 20 || now.hour < 6);
-          float r = is_night ? id(vs_off_n_r) : id(vs_off_r);
-          float g = is_night ? id(vs_off_n_g) : id(vs_off_g);
-          float b = is_night ? id(vs_off_n_b) : id(vs_off_b);
-          float bri = is_night ? id(vs_off_n_bri) : id(vs_off_bri);
-          if (3 < id(gb_lights_1).size()) {
-            if (bri <= 0.0f) {
-              id(gb_lights_1)[3]->turn_off().perform();
-            } else {
-              auto call = id(gb_lights_1)[3]->turn_on();
-              call.set_rgb(r, g, b);
-              call.set_brightness(bri);
-              call.perform();
-            }
-          }
-          if (3 < id(gb_lights_2).size()) {
-            if (bri <= 0.0f) {
-              id(gb_lights_2)[3]->turn_off().perform();
-            } else {
-              auto call = id(gb_lights_2)[3]->turn_on();
-              call.set_rgb(r, g, b);
-              call.set_brightness(bri);
-              call.perform();
-            }
-          }
+      - script.execute: vs_paint_lights
