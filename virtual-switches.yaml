@@ -159,7 +159,7 @@ light:
         to: 31
 
 time:
-  - platform: sntp
+  - platform: homeassistant
     id: device_time
     timezone: America/Sao_Paulo
     on_time_sync:
