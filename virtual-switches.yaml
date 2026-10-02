@@ -234,6 +234,10 @@ script:
     mode: restart
     then:
       - lambda: |-
+          // The select/number on_value triggers fire while their own components are
+          // still setting up, so painting has to wait for the LED and relay groups.
+          if (!id(bs_boot_completed)->state) return;
+
           // A colour of 0,0,0 is not "off" to ESPHome: normalize_color() rewrites an
           // all-zero RGB to white, so a zero colour must be painted as turn_off().
           auto is_dark = [](float r, float g, float b, float bri) -> bool {
@@ -248,8 +252,11 @@ script:
             is_night = false;
           } else {
             const auto now = id(device_time).now();
-            const int start = (int) id(night_start_hour).state;
-            const int end = (int) id(night_end_hour).state;
+            // Fall back to 20 -> 8 if a number has no state yet (state is NaN).
+            const float start_f = id(night_start_hour).state;
+            const float end_f = id(night_end_hour).state;
+            const int start = std::isnan(start_f) ? 20 : (int) start_f;
+            const int end = std::isnan(end_f) ? 8 : (int) end_f;
             // start > end means the window crosses midnight (the usual 20 -> 8).
             is_night = now.is_valid() && (start > end ? (now.hour >= start || now.hour < end)
                                                      : (now.hour >= start && now.hour < end));
