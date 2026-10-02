@@ -165,20 +165,68 @@ time:
     on_time_sync:
       then:
         - script.execute: vs_paint_lights
-    on_time:
-      - seconds: 0
-        minutes: 0
-        hours: 20
-        then:
-          - script.execute: vs_paint_lights
-      - seconds: 0
-        minutes: 0
-        hours: 8
-        then:
-          - script.execute: vs_paint_lights
+
+# Repaint on a timer rather than only at the window edges, so a missed trigger,
+# a reboot or an external write to the strip self-heals within one interval.
+interval:
+  - interval: 2min
+    then:
+      - script.execute: vs_paint_lights
+
+select:
+  # Auto follows the clock; On/Off pin a palette, which is also the only way to
+  # see the night palette without waiting for the night window.
+  - platform: template
+    name: "Night Mode"
+    id: night_mode
+    options:
+      - "Auto"
+      - "On"
+      - "Off"
+    initial_option: "Auto"
+    optimistic: true
+    restore_value: true
+    entity_category: config
+    icon: mdi:weather-night
+    on_value:
+      then:
+        - script.execute: vs_paint_lights
+
+number:
+  - platform: template
+    name: "Night Mode Start Hour"
+    id: night_start_hour
+    optimistic: true
+    restore_value: true
+    initial_value: 20
+    min_value: 0
+    max_value: 23
+    step: 1
+    mode: box
+    entity_category: config
+    icon: mdi:weather-sunset-down
+    on_value:
+      then:
+        - script.execute: vs_paint_lights
+
+  - platform: template
+    name: "Night Mode End Hour"
+    id: night_end_hour
+    optimistic: true
+    restore_value: true
+    initial_value: 8
+    min_value: 0
+    max_value: 23
+    step: 1
+    mode: box
+    entity_category: config
+    icon: mdi:weather-sunset-up
+    on_value:
+      then:
+        - script.execute: vs_paint_lights
 
 script:
-  # Single painter for every LED on the panel. Between 20:00 and 08:00 the night
+  # Single painter for every LED on the panel. Inside the night window the night
   # palette replaces the day one and washes the whole strip; the per-gang segments
   # are then drawn on top so each relay keeps its own on/off indication.
   # Every write happens in one lambda, so the strip is shown once and never flickers.
@@ -186,15 +234,32 @@ script:
     mode: restart
     then:
       - lambda: |-
-          auto now = id(device_time).now();
-          const bool is_night = now.is_valid() && (now.hour >= 20 || now.hour < 8);
+          // A colour of 0,0,0 is not "off" to ESPHome: normalize_color() rewrites an
+          // all-zero RGB to white, so a zero colour must be painted as turn_off().
+          auto is_dark = [](float r, float g, float b, float bri) -> bool {
+            return bri <= 0.0f || (r <= 0.0f && g <= 0.0f && b <= 0.0f);
+          };
+
+          bool is_night;
+          const std::string mode = id(night_mode).current_option();
+          if (mode == "On") {
+            is_night = true;
+          } else if (mode == "Off") {
+            is_night = false;
+          } else {
+            const auto now = id(device_time).now();
+            const int start = (int) id(night_start_hour).state;
+            const int end = (int) id(night_end_hour).state;
+            // start > end means the window crosses midnight (the usual 20 -> 8).
+            is_night = now.is_valid() && (start > end ? (now.hour >= start || now.hour < end)
+                                                     : (now.hour >= start && now.hour < end));
+          }
 
           // Background wash: night "off" colour at night, dark during the day.
-          const float fill_bri = is_night ? id(vs_off_n_bri) : 0.0f;
-          if (fill_bri > 0.0f) {
+          if (is_night && !is_dark(id(vs_off_n_r), id(vs_off_n_g), id(vs_off_n_b), id(vs_off_n_bri))) {
             auto call = id(vs_fill_light).turn_on();
             call.set_rgb(id(vs_off_n_r), id(vs_off_n_g), id(vs_off_n_b));
-            call.set_brightness(fill_bri);
+            call.set_brightness(id(vs_off_n_bri));
             call.set_transition_length(0);
             call.perform();
           } else {
@@ -223,8 +288,8 @@ script:
                 continue;
               }
               auto *segment = (*group)[i];
-              if (bri <= 0.0f) {
-                // Matches the wash, which is also dark whenever bri is 0.
+              if (is_dark(r, g, b, bri)) {
+                // Matches the wash, which is also dark for the same palette.
                 segment->turn_off().set_transition_length(0).perform();
                 continue;
               }
